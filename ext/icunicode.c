@@ -38,7 +38,7 @@ static VALUE to_utf8(UChar *ustr, int32_t ulen) {
  * Returns a string that will sort according to the Unicode collation algorithm.
  *
  */
-static VALUE unicode_sort_key(VALUE string) {
+static VALUE unicode_sort_key(VALUE module, VALUE string) {
   char str[BUF_SIZE];
   UChar ustr[BUF_SIZE];
   int32_t len  = 0;
@@ -91,14 +91,15 @@ static UTransliterator* get_trans(VALUE transform) {
  * Transliterates string using transform.
  *
  */
-static VALUE unicode_transliterate(int argc, VALUE *argv, VALUE string) {
+static VALUE unicode_transliterate(int argc, VALUE *argv, VALUE module) {
   UChar str[BUF_SIZE];
   int32_t slen = 0;
   UErrorCode status = U_ZERO_ERROR;
   UTransliterator *trans;
   VALUE transform;
+  VALUE string;
 
-  rb_scan_args(argc, argv, "01", &transform);
+  rb_scan_args(argc, argv, "11", &string, &transform);
   if (NIL_P(transform)) transform = rb_str_new2("Latin; Lower; NFD; [^[:letter:] [:space:] [0-9] [:punctuation:]] Remove; NFC");
 
   to_utf16(string, str, &slen);
@@ -110,8 +111,10 @@ static VALUE unicode_transliterate(int argc, VALUE *argv, VALUE string) {
 }
 
 void Init_icunicode() {
-  rb_define_method(rb_cString, "unicode_sort_key", unicode_sort_key, 0);
-  rb_define_method(rb_cString, "transliterate", unicode_transliterate, -1);
+  VALUE mICUnicode;
+  mICUnicode = rb_define_module("ICUnicode");
+  rb_define_module_function(mICUnicode, "unicode_sort_key", unicode_sort_key, 1);
+  rb_define_module_function(mICUnicode, "transliterate", unicode_transliterate, -1);
 
   trans_hash = rb_hash_new();
   rb_global_variable(&trans_hash);
