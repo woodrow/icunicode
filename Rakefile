@@ -48,7 +48,7 @@ task :clean do
   `rm -rf ext/lib ext/bin ext/sbin ext/share ext/include`
 end
 
-require 'rake/rdoctask'
+require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   if File.exist?('VERSION')
     version = File.read('VERSION')

@@ -1,8 +1,12 @@
-#include "ruby.h"
 #include "unicode/ucol.h"
 #include "unicode/utrans.h"
 #include "unicode/ustring.h"
 #include "unicode/ustdio.h"
+
+#define ONIG_ESCAPE_UCHAR_COLLISION
+#include "ruby.h"
+#include "ruby/encoding.h"
+
 
 #define BUF_SIZE 1000
 
@@ -24,7 +28,7 @@ static VALUE to_utf8(UChar *ustr, int32_t ulen) {
 
   u_strToUTF8(str, BUF_SIZE, &len, ustr, ulen, &status);
   if (status == U_INVALID_CHAR_FOUND) len = 0;
-  return rb_str_new(str, len);
+  return rb_enc_str_new(str, len, rb_utf8_encoding());
 }
 
 /*
