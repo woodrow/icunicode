@@ -5,7 +5,14 @@ correctly. But there is a widely-used implementation of the Unicode collation al
 the ICU (International Components for Unicode) libraries. There is also no way to do
 Transliteration in Ruby (http://userguide.icu-project.org/transforms/general). This gem is
 a simple C wrapper around ucol_getSortKey from the ICU Collation API and utrans_transUChars
-from the ICU Transliteration API. These are added as simple methods on String.
+from the ICU Transliteration API.
+
+== This fork
+
+This fork differs from the upstream in two major ways:
+- icunicode been made encoding-aware for Ruby 1.9+
+- the methods are provided as methods on an ICUnicode module rather than
+  monkeypatching them onto String
 
 == Usage:
 
@@ -14,13 +21,13 @@ from the ICU Transliteration API. These are added as simple methods on String.
 
   require 'icunicode'
 
-  ["cafe", "cafes", "caf\303\251"].sort_by {|s| s.unicode_sort_key}
+  ["cafe", "cafes", "caf\303\251"].sort_by {|s| ICUnicode.unicode_sort_key(s)}
   => ["cafe", "caf\303\251", "cafes"]
 
-  "blueberry".transliterate("Katakana").transliterate("Latin")
+  ICUnicode.transliterate(ICUnicode.transliterate("blueberry", "Katakana"), "Latin")
   => "burueberrui"
 
-  "blueberry".transliterate("Greek").transliterate("Latin")
+  ICUnicode.transliterate(ICUnicode.transliterate("blueberry", "Greek"), "Latin")
   => "blyeberry"
 
 == Install:
@@ -29,7 +36,7 @@ You must install ICU first. You can download the source from http://site.icu-pro
 or on Mac, you can either install with MacPorts:
 
   sudo port install icu
-  
+
 Or, if you're using homebrew:
 
   brew install icu4c
