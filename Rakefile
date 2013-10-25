@@ -2,6 +2,10 @@ require 'rubygems'
 require 'bundler/setup'
 require 'rake'
 
+task :test do
+  `cd ext && ruby extconf.rb && make`
+end
+
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
@@ -25,7 +29,7 @@ end
 task :default => :test
 
 task :clean do
-  `rm -rf ext/lib ext/bin ext/sbin ext/share ext/include`
+  `git clean -fdx ext/`
 end
 
 require 'rdoc/task'
