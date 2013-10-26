@@ -22,13 +22,30 @@ static void to_utf16(VALUE string, UChar *ustr, int32_t *ulen) {
 }
 
 static VALUE to_utf8(UChar *ustr, int32_t ulen) {
-  char str[BUF_SIZE];
-  int32_t len = 0;
-  UErrorCode status = U_ZERO_ERROR;
+    char buffer[BUF_SIZE];
+    int32_t len = 0;
+    UErrorCode status = U_ZERO_ERROR;
 
-  u_strToUTF8(str, BUF_SIZE, &len, ustr, ulen, &status);
-  if (status == U_INVALID_CHAR_FOUND) len = 0;
-  return rb_enc_str_new(str, len, rb_utf8_encoding());
+    /* Figure out the size of the buffer we need to allocate: */
+    u_strToUTF8(buffer, 0, &len, ustr, ulen, &status);
+    if (status == U_INVALID_CHAR_FOUND)
+        len = 0;
+    else if (U_FAILURE(status) && status != U_BUFFER_OVERFLOW_ERROR)
+        return Qnil;
+
+    /* Allocate the buffer and encode into it: */
+    status = U_ZERO_ERROR;
+    char *ptr = ALLOC_N(char, len);
+    u_strToUTF8(ptr, len, &len, ustr, ulen, &status);
+    if (U_FAILURE(status)) {
+        xfree(ptr);
+        return Qnil;
+    }
+
+    VALUE str = rb_enc_str_new(ptr, len, rb_utf8_encoding());
+    xfree(ptr);
+    return str;
+;
 }
 
 /*
@@ -107,7 +124,7 @@ static VALUE unicode_transliterate(int argc, VALUE *argv, VALUE module) {
   trans = get_trans(transform);
   utrans_transUChars(trans, str, &slen, BUF_SIZE, 0, &slen, &status);
 
-  to_utf8(str, slen);
+  return to_utf8(str, slen);
 }
 
 void Init_icunicode() {

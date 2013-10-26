@@ -1,25 +1,13 @@
 require 'rubygems'
+require 'bundler/setup'
 require 'rake'
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "icunicode"
-    gem.summary = %Q{Unicode Transliteration and Collation in Ruby.}
-    gem.description = "ICU Unicode Transliteration and Collation in Ruby."
-    gem.email = "code@justinbalthrop.com"
-    gem.homepage = "http://github.com/ninjudd/icunicode"
-    gem.authors = ["Justin Balthrop"]
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
+task :test do
+  `cd ext && ruby extconf.rb && make`
 end
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
   test.pattern = 'test/**/*_test.rb'
   test.verbose = true
 end
@@ -37,15 +25,10 @@ rescue LoadError
   end
 end
 
-task :test => :check_dependencies do
-  `cd ext && ruby extconf.rb && make && cp icunicode.bundle icunicode.o ../test/`
-end
-
-
 task :default => :test
 
 task :clean do
-  `rm -rf ext/lib ext/bin ext/sbin ext/share ext/include`
+  `git clean -fdx ext/`
 end
 
 require 'rdoc/task'
