@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
   s.homepage = "http://github.com/ninjudd/icunicode"
-  s.require_paths = ["lib"]
+  s.require_paths = ["ext"]
   s.rubygems_version = "1.8.23"
   s.summary = "Unicode Transliteration and Collation in Ruby."
 
