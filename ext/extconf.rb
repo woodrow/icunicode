@@ -11,5 +11,6 @@ LIB_DIRS=['/usr/local/opt/icu4c/lib', '/usr/lib', '/usr/local/lib', '/opt/local/
 find_library('icui18n', nil, *LIB_DIRS)
 find_library('icuio', nil, *LIB_DIRS)
 find_library('icuuc', nil, *LIB_DIRS)
+find_library('icudata', nil, *LIB_DIRS)
 
 create_makefile('icunicode')
